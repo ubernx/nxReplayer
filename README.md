@@ -68,3 +68,8 @@ If bindings become corrupted, **default binds will automatically reload**.
 | `exit` | Exits the program |
 
 ---
+
+## 🧾 Example Script (`main.txt`)
+
+```text
+wait 50;+forward;sprint;wait 400;run anotherfile;wait 200;-forward

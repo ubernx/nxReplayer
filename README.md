@@ -1,5 +1,5 @@
 # nxReplayer  
-**TAS Emulator for S.T.A.L.K.E.R.: Shadow of Chernobyl**  
+TAS Emulator for S.T.A.L.K.E.R.: Shadow of Chernobyl 
 
 `nxReplayer` is a minimalist command-line utility that enables **Tool-Assisted Speedruns (TAS)** through scripted event replay in *S.T.A.L.K.E.R.: Shadow of Chernobyl*.  
 It provides a simple scripting interface for automating in-game actions, timing sequences, and replays.

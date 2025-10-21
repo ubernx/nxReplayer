@@ -198,55 +198,55 @@ struct UserBinds_s {
 
     inline static const std::unordered_map<std::string, DWORD> KEY_MAP = {
         // Letters
-        {"A", DIK_A}, {"B", DIK_B}, {"C", DIK_C}, {"D", DIK_D}, {"E", DIK_E},
-        {"F", DIK_F}, {"G", DIK_G}, {"H", DIK_H}, {"I", DIK_I}, {"J", DIK_J},
-        {"K", DIK_K}, {"L", DIK_L}, {"M", DIK_M}, {"N", DIK_N}, {"O", DIK_O},
-        {"P", DIK_P}, {"Q", DIK_Q}, {"R", DIK_R}, {"S", DIK_S}, {"T", DIK_T},
-        {"U", DIK_U}, {"V", DIK_V}, {"W", DIK_W}, {"X", DIK_X}, {"Y", DIK_Y},
-        {"Z", DIK_Z},
+        {"A", 'A'}, {"B", 'B'}, {"C", 'C'}, {"D", 'D'}, {"E", 'E'},
+        {"F", 'F'}, {"G", 'G'}, {"H", 'H'}, {"I", 'I'}, {"J", 'J'},
+        {"K", 'K'}, {"L", 'L'}, {"M", 'M'}, {"N", 'N'}, {"O", 'O'},
+        {"P", 'P'}, {"Q", 'Q'}, {"R", 'R'}, {"S", 'S'}, {"T", 'T'},
+        {"U", 'U'}, {"V", 'V'}, {"W", 'W'}, {"X", 'X'}, {"Y", 'Y'},
+        {"Z", 'Z'},
 
         // Numbers
-        {"0", DIK_0}, {"1", DIK_1}, {"2", DIK_2}, {"3", DIK_3}, {"4", DIK_4},
-        {"5", DIK_5}, {"6", DIK_6}, {"7", DIK_7}, {"8", DIK_8}, {"9", DIK_9},
+        {"0", '0'}, {"1", '1'}, {"2", '2'}, {"3", '3'}, {"4", '4'},
+        {"5", '5'}, {"6", '6'}, {"7", '7'}, {"8", '8'}, {"9", '9'},
 
         // Function keys
-        {"F1", DIK_F1}, {"F2", DIK_F2}, {"F3", DIK_F3}, {"F4", DIK_F4},
-        {"F5", DIK_F5}, {"F6", DIK_F6}, {"F7", DIK_F7}, {"F8", DIK_F8},
-        {"F9", DIK_F9}, {"F10", DIK_F10}, {"F11", DIK_F11}, {"F12", DIK_F12},
+        {"F1", VK_F1}, {"F2", VK_F2}, {"F3", VK_F3}, {"F4", VK_F4},
+        {"F5", VK_F5}, {"F6", VK_F6}, {"F7", VK_F7}, {"F8", VK_F8},
+        {"F9", VK_F9}, {"F10", VK_F10}, {"F11", VK_F11}, {"F12", VK_F12},
 
         // Modifiers
-        {"SHIFT", DIK_LSHIFT}, {"CTRL", DIK_LCONTROL}, {"ALT", DIK_LMENU},
-        {"CAPSLOCK", DIK_CAPSLOCK}, {"TAB", DIK_TAB}, {"SPACE", DIK_SPACE},
+        {"SHIFT", VK_SHIFT}, {"CTRL", VK_CONTROL}, {"ALT", VK_MENU},
+        {"CAPSLOCK", VK_CAPITAL}, {"TAB", VK_TAB}, {"SPACE", VK_SPACE},
 
         // Navigation
-        {"UP", DIK_UP}, {"DOWN", DIK_DOWN}, {"LEFT", DIK_LEFT}, {"RIGHT", DIK_RIGHT},
-        {"HOME", DIK_HOME}, {"END", DIK_END}, {"PGUP", DIK_PGUP}, {"PGDN", DIK_PGDN},
-        {"INSERT", DIK_INSERT}, {"DELETE", DIK_DELETE},
+        {"UP", VK_UP}, {"DOWN", VK_DOWN}, {"LEFT", VK_LEFT}, {"RIGHT", VK_RIGHT},
+        {"HOME", VK_HOME}, {"END", VK_END}, {"PGUP", VK_PRIOR}, {"PGDN", VK_NEXT},
+        {"INSERT", VK_INSERT}, {"DELETE", VK_DELETE},
 
         // Symbols (main keyboard)
-        {"-", DIK_MINUS}, {"EQUALS", DIK_EQUALS}, {"=", DIK_EQUALS},
-        {"[", DIK_LBRACKET}, {"]", DIK_RBRACKET},
-        {"\\", DIK_BACKSLASH}, {";", DIK_SEMICOLON}, {"'", DIK_APOSTROPHE},
-        {",", DIK_COMMA}, {".", DIK_PERIOD}, {"/", DIK_SLASH},
-        {"`", DIK_GRAVE},
+        {"-", VK_OEM_MINUS}, {"EQUALS", VK_OEM_PLUS}, {"=", VK_OEM_PLUS},
+        {"[", VK_OEM_4}, {"]", VK_OEM_6},
+        {"\\", VK_OEM_5}, {";", VK_OEM_1}, {"'", VK_OEM_7},
+        {",", VK_OEM_COMMA}, {".", VK_OEM_PERIOD}, {"/", VK_OEM_2},
+        {"`", VK_OEM_3},
 
         // Numpad
-        {"NUM0", DIK_NUMPAD0}, {"NUM1", DIK_NUMPAD1}, {"NUM2", DIK_NUMPAD2},
-        {"NUM3", DIK_NUMPAD3}, {"NUM4", DIK_NUMPAD4}, {"NUM5", DIK_NUMPAD5},
-        {"NUM6", DIK_NUMPAD6}, {"NUM7", DIK_NUMPAD7}, {"NUM8", DIK_NUMPAD8},
-        {"NUM9", DIK_NUMPAD9},
-        {"NUMPLUS", DIK_NUMPADPLUS}, {"+", DIK_NUMPADPLUS},
-        {"NUMMINUS", DIK_NUMPADMINUS},
-        {"NUMDEL", DIK_NUMPADPERIOD},
-        {"NUMENTER", DIK_NUMPADENTER},
+        {"NUM0", VK_NUMPAD0}, {"NUM1", VK_NUMPAD1}, {"NUM2", VK_NUMPAD2},
+        {"NUM3", VK_NUMPAD3}, {"NUM4", VK_NUMPAD4}, {"NUM5", VK_NUMPAD5},
+        {"NUM6", VK_NUMPAD6}, {"NUM7", VK_NUMPAD7}, {"NUM8", VK_NUMPAD8},
+        {"NUM9", VK_NUMPAD9},
+        {"NUMPLUS", VK_ADD}, {"+", VK_ADD},
+        {"NUMMINUS", VK_SUBTRACT},
+        {"NUMDEL", VK_DELETE},
+        {"NUMENTER", VK_RETURN},
 
         // Special
-        {"ESC", DIK_ESCAPE}, {"BACKSPACE", DIK_BACK}, {"ENTER", DIK_RETURN},
-        {"PRINTSCREEN", DIK_SYSRQ}, {"PAUSE", DIK_PAUSE}, {"MENU", DIK_APPS},
+        {"ESC", VK_ESCAPE}, {"BACKSPACE", VK_BACK}, {"ENTER", VK_RETURN},
+        {"PRINTSCREEN", VK_SNAPSHOT}, {"PAUSE", VK_PAUSE}, {"MENU", VK_APPS},
 
         // Mouse placeholders
-        {"MOUSE1", 0x100}, {"MOUSE2", 0x101}, {"MOUSE3", 0x102},
-        {"MOUSE4", 0x103}, {"MOUSE5", 0x104},
+        {"MOUSE1", 1}, {"MOUSE2", 2}, {"MOUSE3", 3},
+        {"MOUSE4", 4}, {"MOUSE5", 5},
     };
 
     inline static const std::unordered_map<std::string, int> ACTION_MAP = {

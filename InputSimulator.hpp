@@ -22,41 +22,60 @@ public:
     }
 
     void SimulateKey(WORD vkCode, bool down) {
-        // Use SendInput for key simulation
-        INPUT input = {0};
-        input.type = INPUT_KEYBOARD;
-        input.ki.wVk = vkCode;
-        input.ki.wScan = MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
-        input.ki.dwFlags = down ? 0 : KEYEVENTF_KEYUP;
-        // Extended key flag for certain keys
+        if (!targetWindow) {
+            UINT scanCode = MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
+            DWORD flags = down ? 0 : KEYEVENTF_KEYUP;
+
+            if (vkCode == VK_CONTROL || vkCode == VK_SHIFT ||
+                vkCode == VK_MENU || vkCode == VK_UP || vkCode == VK_DOWN ||
+                vkCode == VK_LEFT || vkCode == VK_RIGHT) {
+                flags |= KEYEVENTF_EXTENDEDKEY;
+            }
+
+            keybd_event(static_cast<BYTE>(vkCode), static_cast<BYTE>(scanCode), flags, 0);
+            return;
+        }
+
+        UINT scanCode = MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
+        LPARAM lParam = (scanCode << 16) | 1;
+
+        if (!down) {
+            lParam |= (1 << 30);
+            lParam |= (1 << 31);
+        }
+
         if (vkCode == VK_CONTROL || vkCode == VK_SHIFT ||
             vkCode == VK_MENU || vkCode == VK_UP || vkCode == VK_DOWN ||
             vkCode == VK_LEFT || vkCode == VK_RIGHT ||
             (vkCode >= VK_F1 && vkCode <= VK_F24)) {
-            input.ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+            lParam |= (1 << 24);
         }
-        SendInput(1, &input, sizeof(INPUT));
+
+        if (down) {
+            PostMessage(targetWindow, WM_KEYDOWN, vkCode, lParam);
+        } else {
+            PostMessage(targetWindow, WM_KEYUP, vkCode, lParam);
+        }
+
         Sleep(1);
     }
 
     void SimulateMouseButton(int button, bool down) {
-        // button: 1 = left, 2 = right
-        INPUT input = {0};
-        input.type = INPUT_MOUSE;
-        if (button == 1) {
-            input.mi.dwFlags = down ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP;
-        } else {
-            input.mi.dwFlags = down ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP;
-        }
-        SendInput(1, &input, sizeof(INPUT));
+        DWORD flags = (button == 1 ?
+            (down ? MOUSEEVENTF_LEFTDOWN : MOUSEEVENTF_LEFTUP) :
+            (down ? MOUSEEVENTF_RIGHTDOWN : MOUSEEVENTF_RIGHTUP));
+        mouse_event(flags, 0, 0, 0, 0);
     }
 
     void SimulateMouseMove(int dx, int dy) {
-        INPUT input = {0};
+        // Use SendInput for relative movement and prevent Windows from coalescing moves.
+        if (dx == 0 && dy == 0) return;
+
+        INPUT input{};
         input.type = INPUT_MOUSE;
         input.mi.dx = dx;
         input.mi.dy = dy;
-        input.mi.dwFlags = MOUSEEVENTF_MOVE;
+        input.mi.dwFlags = MOUSEEVENTF_MOVE | 0x2000; // 0x2000 == MOUSEEVENTF_MOVE_NOCOALESCE
         SendInput(1, &input, sizeof(INPUT));
     }
 

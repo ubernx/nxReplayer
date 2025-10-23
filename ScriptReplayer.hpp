@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include <cmath>       // std::fabs
+#include <cmath>       // std::fabs, trunc
 #include <thread>      // std::this_thread
 
 struct ScriptReplayer_s {
@@ -33,6 +33,10 @@ struct ScriptReplayer_s {
     float yawspeed = 0.0f;
     float pitchspeed = 0.0f;
     std::unordered_map<int, bool> heldStates; // allows binary actions to be togglable/detogglable, a togglemap
+
+    // accumulators for fractional mouse movement to avoid truncation jitter
+    float accumMouseX = 0.0f;
+    float accumMouseY = 0.0f;
 
     enum BINARY_STATE_ACTIONS {
         CROUCH      = -101,
@@ -94,6 +98,10 @@ struct ScriptReplayer_s {
         scriptLength = length;
         yawspeed = 0.0f;
         pitchspeed = 0.0f;
+
+        // reset accumulators
+        accumMouseX = 0.0f;
+        accumMouseY = 0.0f;
 
 
         // Emptying the togglemap content from previous execution
@@ -163,6 +171,9 @@ struct ScriptReplayer_s {
         scriptLength = length;
         yawspeed = 0.0f;
         pitchspeed = 0.0f;
+        // reset accumulators
+        accumMouseX = 0.0f;
+        accumMouseY = 0.0f;
         heldStates.clear();
         userBinds.setup();
         actionReader();
@@ -220,25 +231,34 @@ struct ScriptReplayer_s {
                     case WAIT: {
                         // Break wait into frames, applying held mouse looks each frame
                         for (DWORD elapsed = 0; elapsed < static_cast<DWORD>(value); elapsed += frameSleep) {
-                            // Accumulate mouse movement for this frame
-                            int dx = 0, dy = 0;
+                            // Accumulate fractional mouse movement per frame (preserve precision)
+                            float deltaX = 0.0f, deltaY = 0.0f;
 
                             if (heldStates[LEFT] && yawspeed != 0.0f) {
-                                dx -= static_cast<int>(yawspeed * frameTime);
+                                deltaX -= (yawspeed * frameTime);
                             }
                             if (heldStates[RIGHT] && yawspeed != 0.0f) {
-                                dx += static_cast<int>(yawspeed * frameTime);
+                                deltaX += (yawspeed * frameTime);
                             }
                             if (heldStates[UP] && pitchspeed != 0.0f) {
-                                dy -= static_cast<int>(pitchspeed * frameTime);
+                                deltaY -= (pitchspeed * frameTime);
                             }
                             if (heldStates[DOWN] && pitchspeed != 0.0f) {
-                                dy += static_cast<int>(pitchspeed * frameTime);
+                                deltaY += (pitchspeed * frameTime);
                             }
 
-                            // Apply accumulated movement in ONE call
-                            if (dx != 0 || dy != 0) {
-                                sim.SimulateMouseMove(dx, dy);
+                            // Add to accumulators (retain fractional parts)
+                            accumMouseX += deltaX;
+                            accumMouseY += deltaY;
+
+                            // Only send integer movement; subtract sent amount from accumulators
+                            int sendX = static_cast<int>(accumMouseX); // trunc toward zero
+                            int sendY = static_cast<int>(accumMouseY);
+
+                            if (sendX != 0 || sendY != 0) {
+                                sim.SimulateMouseMove(sendX, sendY);
+                                accumMouseX -= sendX;
+                                accumMouseY -= sendY;
                             }
 
                             // Keys/buttons stay held automatically—no resend needed

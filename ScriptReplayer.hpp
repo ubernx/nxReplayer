@@ -17,12 +17,14 @@ struct ScriptReplayer_s {
     InputSimulator sim;
 
 
+
     const std::string UNKNOWN_BINARY_ACTION        = "Unknown toggle (+/-)action: ";
     const std::string UNKNOWN_PARAMETERIZED_ACTION = "Unknown parameter: ";
     const std::string UNKNOWN_TRIGGER_ACTION       = "Unknown trigger action: ";
     const std::string SCRIPT_EXECUTION_TERMINATED  = "Script execution terminated by engaging ingame console\n";
     const std::string WAITING_FOR_CLIENT_SYNC      = "Waiting for client sync loading stage...\n";
-    const std::string CLIENT_SYNC_DETECTED         = "Client Sync Detected! Starting script execution...\n";
+    const std::string CLIENT_SYNC_DETECTED         = "Client Sync Detected!\n";
+    const std::string CLIENT_INPUT_UNLOCKED        = "User Input Unlocked, starting script execution......\n";
     const std::string GAME_NOT_FOUND               = "Game process (XR_3DA.exe) or window not found\n";
     const std::string FAILED_OPEN_PROCESS          = "Failed to open process for memory reading\n";
     const std::string COULD_NOT_RESOLVE_MODULES    = "Could not resolve required module base addresses\n";
@@ -160,6 +162,13 @@ struct ScriptReplayer_s {
         // Game is now in client sync, userinput is unlocked, initiate script
         std::cout << CLIENT_SYNC_DETECTED;
 
+        while (true) {
+            if (gameProcess.isActorSpinning(hProcess, baseAddr) || gameProcess.isSpinning(hProcess, baseAddr)) {break;}
+        }
+
+        // Game input is now unlocked, start script execution
+
+        std::cout << CLIENT_INPUT_UNLOCKED;
         CloseHandle(hProcess);
         actionReader();
     }

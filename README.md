@@ -49,9 +49,13 @@ It provides a simple scripting interface for automating in-game actions, timing 
 ## 🗂️ `binds.txt` Notes
 
 A **default `binds.txt`** is provided for players using custom in-game keybinds.  
-⚠️ **Do not change the order** of assigned actions — doing so can cause mismatches (e.g. `jump` triggering `pause`).  
+⚠️ **Do not**:
+- change the order of the binds assignment
+- map the same action twice
+- map the same key twice
 
-If bindings become corrupted, **default binds will automatically reload**.
+**Otherwise: default binds will be loaded instead**
+
 
 ---
 

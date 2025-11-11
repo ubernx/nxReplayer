@@ -12,11 +12,10 @@
 #include <thread>      // std::this_thread
 
 struct ScriptReplayer_s {
+
     int* scriptData = nullptr;
     size_t scriptLength = 0;
     InputSimulator sim;
-
-
 
     const std::string UNKNOWN_BINARY_ACTION        = "Unknown toggle (+/-)action: ";
     const std::string UNKNOWN_PARAMETERIZED_ACTION = "Unknown parameter: ";
@@ -143,10 +142,10 @@ struct ScriptReplayer_s {
         // Memory Addresses which are used by STALKER to store the booting state of the game, 0000 v1.0000, 0006 v1.0006 shoc versions
         uintptr_t loadingAddr_0000 = netBase + 0xFAC4;
         uintptr_t loadingAddr_0006 = netBase + 0x13E84;
-        uintptr_t syncAddr         = baseAddr + 0x10BE80;
+
 
         BYTE loading_0000 = 0, loading_0006 = 0;
-        float sync = 0.0f;
+
 
         std::cout << WAITING_FOR_CLIENT_SYNC;
 
@@ -319,6 +318,25 @@ struct ScriptReplayer_s {
                     default:         std::cerr << UNKNOWN_TRIGGER_ACTION << opcode << "\n"; break;
                 }
             }
+
+            HWND hwnd = gameProcess.FindGameWindow("XR_3DA.exe");
+            DWORD pid = gameProcess.GetProcessIdFromWindow(hwnd);
+            HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, pid);
+            uintptr_t netBase = gameProcess.GetModuleBaseAddress(pid, "xrNetServer.dll");
+
+
+            auto isGameLoaded = [&]() -> bool {
+                BYTE loading_0000 = 0, loading_0006 = 0;
+                ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0xFAC4), &loading_0000, 1, NULL);
+                ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0x13E84), &loading_0006, 1, NULL);
+                return (loading_0000 == 1 || loading_0006 == 1);
+            };
+
+            if (!isGameLoaded()) {
+                std::cerr << "Game is no longer loaded.\n";
+                return;
+            }
+
         }
     }
 

@@ -346,7 +346,7 @@ struct ScriptReplayer_s {
             }
         }
 
-        // Check game state using cached handles - only runs once per script command
+
         if (!isGameLoaded()) {
             std::cerr << "Game is no longer loaded.\n";
             CloseHandle(hProcess);  // Clean up handle

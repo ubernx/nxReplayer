@@ -37,8 +37,6 @@ struct ScriptFile_s {
     const char CLOSED_SBRACKED          = ']';
     const std::string TYPO_WARNING      = "Warning: Unknown action '";
     const std::string IN_FILE           = "' in file ";
-
-    // Added small centralized message
     const std::string FILE_NOT_FOUND    = "File not Found";
 
     bool hasTypo                        = false;
@@ -152,11 +150,8 @@ struct ScriptFile_s {
 
                 // Trim whitespace
 
-                while (!token.empty() && std::isspace(static_cast<unsigned char>(token.front())))
-                    token.erase(token.begin());
-
-                while (!token.empty() && std::isspace(static_cast<unsigned char>(token.back())))
-                    token.pop_back();
+                while (!token.empty() && std::isspace(static_cast<unsigned char>(token.front()))) token.erase(token.begin());
+                while (!token.empty() && std::isspace(static_cast<unsigned char>(token.back())))  token.pop_back();
 
                 // Handle recursive script call
                 if (token.rfind(RUN_FUNCTION, 0) == 0) {
@@ -211,18 +206,12 @@ struct ScriptFile_s {
 
     }
 
-
-
-
-
-
     void convert() {
 
     std::vector<int> temp;
     temp.reserve(tokens.size() * 2);
 
     for (const auto& tokenRaw : tokens) {
-
 
         std::string token = tokenRaw;
         if (token.empty()) continue;
@@ -274,11 +263,7 @@ struct ScriptFile_s {
                         temp.push_back(it->second);
                         temp.push_back(value);
 
-                    } catch (...) {
-
-                        std::cerr << CORRUPTED_TOKEN << token << "\n";
-
-                    }
+                    } catch (...) { std::cerr << CORRUPTED_TOKEN << token << "\n"; }
 
                 } else if (it->second <= -300 && it->second > -400) {
 
@@ -306,25 +291,26 @@ struct ScriptFile_s {
 
     // sanity check: must be even number of binary actions
     if (!(binaryActionsCount % 2 == 0)) {
+
         std::cout << UNEVEN_BAC;
         return;
+
     }
 
     // allocate primitive buffer
     tokenCount = temp.size();
     data = std::make_unique<int[]>(tokenCount);
 
-    for (size_t i = 0; i < tokenCount; ++i)
-        data[i] = temp[i];
+    for (size_t i = 0; i < tokenCount; ++i) data[i] = temp[i];
 
     if (hasTypo) {
+
         tokens.clear();
         data.reset();
         tokenCount = 0;
         return;
-    } else {
-        isSetUp = true;
-    }
+
+    } else { isSetUp = true; }
 
 }
 
@@ -348,11 +334,8 @@ struct ScriptFile_s {
             if (i + 1 < tokenCount) std::cout << COMMA;
 
         }
-
         std::cout << CLOSED_SBRACKED << "\n";
-
     }
-
 
 };
 

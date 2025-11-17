@@ -12,11 +12,13 @@
 // Loading ANSI Colors
 
 void enableANSI() {
+
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD dwMode = 0;
     GetConsoleMode(hOut, &dwMode);
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode(hOut, dwMode);
+
 }
 
 const std::string RESET       = "\033[0m";
@@ -99,10 +101,12 @@ std::unordered_map<std::string, Command> commandMap = {
 
 
 std::string toLowerCase(const std::string& s) {
+
     std::string result = s;
     std::transform(result.begin(), result.end(), result.begin(),
                    [](unsigned char c){ return std::tolower(c); });
     return result;
+
 }
 
 
@@ -127,7 +131,6 @@ int main(int argc, char* argv[]) {
         auto it = commandMap.find(userInput);
         if (it != commandMap.end()) cmd = it->second;
 
-
         switch (cmd) {
 
             case CMD_LOAD:        script.load();
@@ -147,22 +150,30 @@ int main(int argc, char* argv[]) {
                 script.convert();
 
                 if (script.isSetUp) {
+
                     replayer.run(script.data.get(), script.tokenCount);
+
                 } else {
+
                     std::cout << UNLOADED_OR_UNCONVERTED;
+
                 }
                 break;
             }
 
             case CMD_START_SCRIPT: {
+
                 script.load();
                 script.convert();
 
                 if (script.isSetUp) {
 
                     replayer.start(script.data.get(), script.tokenCount);
+
                 } else {
+
                     std::cout << UNLOADED_OR_UNCONVERTED;
+
                 }
                 break;
             }

@@ -8,14 +8,10 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include <cmath>       // std::fabs, trunc
-#include <thread>      // std::this_thread
+#include <cmath>
+#include <thread>
 
 struct ScriptReplayer_s {
-
-    int* scriptData = nullptr;
-    size_t scriptLength = 0;
-    InputSimulator sim;
 
     const std::string UNKNOWN_BINARY_ACTION        = "Unknown toggle (+/-)action: ";
     const std::string UNKNOWN_PARAMETERIZED_ACTION = "Unknown parameter: ";
@@ -31,15 +27,22 @@ struct ScriptReplayer_s {
     const std::string PROCESS_NOT_FOUND_SUFFIX     = " not found\n";
     const std::string NO_VISIBLE_WINDOW_PREFIX     = "No visible window found for process ";
 
-    float yawspeed = 0.0f;
-    float pitchspeed = 0.0f;
-    std::unordered_map<int, bool> heldStates; // allows binary actions to be togglable/detogglable, a togglemap
+    int* scriptData     = nullptr;
+    size_t scriptLength = 0;
 
-    // accumulators for fractional mouse movement to avoid truncation jitter
+    float yawspeed    = 0.0f;
+    float pitchspeed  = 0.0f;
     float accumMouseX = 0.0f;
     float accumMouseY = 0.0f;
 
+    std::unordered_map<int, bool> heldStates; // allows binary actions to be togglable/detogglable, a togglemap
+
+    GameProcessUtils_s  gameProcess;
+    UserBinds_s         userBinds;
+    InputSimulator      sim;
+
     enum BINARY_STATE_ACTIONS {
+
         CROUCH      = -101,
         MOVELEFT    = -102,
         MOVERIGHT   = -103,
@@ -54,15 +57,19 @@ struct ScriptReplayer_s {
         LEANRIGHT   = -112,
         FIRE        = -113,
         ZOOM        = -114
+
     };
 
     enum PARAMETERIZED_STATE_ACTIONS {
+
         WAIT        = -201,
         YAWSPEED    = -202,
         PITCHSPEED  = -203
+
     };
 
     enum TRIGGER_STATE_ACTIONS {
+
         INVENTORY   = -301,
         MEDKIT      = -302,
         BANDAGE     = -303,
@@ -86,102 +93,97 @@ struct ScriptReplayer_s {
         FIREMODE    = -321,
         TIMEACCEL   = -322,
         TIMEDECCEL  = -323
+
     };
 
-    // GameProcessUtils for required gamestate checks
-    GameProcessUtils_s gameProcess;
-
-    // UserBinds for mapping available keystrokes off the binds file
-    UserBinds_s userBinds;
-
     void start(int* data, size_t length) {
-        scriptData = data;
+
+        scriptData   = data;
         scriptLength = length;
-        yawspeed = 0.0f;
-        pitchspeed = 0.0f;
+        yawspeed     = 0.0f;
+        pitchspeed   = 0.0f;
+        accumMouseX  = 0.0f;
+        accumMouseY  = 0.0f;
 
-        // reset accumulators
-        accumMouseX = 0.0f;
-        accumMouseY = 0.0f;
-
-
-        // Emptying the togglemap content from previous execution
         heldStates.clear();
-
-        // loading our userbinds
         userBinds.setup();
 
-        // Drop Execution if the game isnt running
+        // Drop Execution if the game isn't running
         HWND hwnd = gameProcess.FindGameWindow("XR_3DA.exe");
+
         if (hwnd) {
+
             ShowWindow(hwnd, SW_RESTORE);  // Restore if minimized
             SetForegroundWindow(hwnd);
+
         } else {
+
             std::cerr << GAME_NOT_FOUND;
             return;  // Exit to avoid sending inputs elsewhere
+
         }
 
         DWORD pid = gameProcess.GetProcessIdFromWindow(hwnd);
         HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, pid);
+
         if (!hProcess) {
+
             std::cerr << FAILED_OPEN_PROCESS;
             return;
+
         }
 
         // Getting what is being stored in gamestate addresses
 
         uintptr_t baseAddr = gameProcess.GetModuleBaseAddress(pid, "XR_3DA.exe");
-        uintptr_t netBase = gameProcess.GetModuleBaseAddress(pid, "xrNetServer.dll");
+        uintptr_t netBase  = gameProcess.GetModuleBaseAddress(pid, "xrNetServer.dll");
 
         if (!baseAddr || !netBase) {
+
             std::cerr << COULD_NOT_RESOLVE_MODULES;
             CloseHandle(hProcess);
             return;
+
         }
 
         // Memory Addresses which are used by STALKER to store the booting state of the game, 0000 v1.0000, 0006 v1.0006 shoc versions
         uintptr_t loadingAddr_0000 = netBase + 0xFAC4;
         uintptr_t loadingAddr_0006 = netBase + 0x13E84;
-
-
         BYTE loading_0000 = 0, loading_0006 = 0;
-
-
         std::cout << WAITING_FOR_CLIENT_SYNC;
-
 
         // Sleeppausing until game achieves client sync booting stage
         while (true) {
+
             ReadProcessMemory(hProcess, (LPCVOID)loadingAddr_0000, &loading_0000, 1, NULL);
             ReadProcessMemory(hProcess, (LPCVOID)loadingAddr_0006, &loading_0006, 1, NULL);
             if (loading_0000 == 1 || loading_0006 == 1) break;
             Sleep(1);
+
         }
 
         // Game is now in client sync, userinput is unlocked, initiate script
         std::cout << CLIENT_SYNC_DETECTED;
-
-        while (true) {
-            if (gameProcess.isActorSpinning(hProcess, baseAddr) || gameProcess.isSpinning(hProcess, baseAddr)) {break;}
-        }
+        while (true) { if (gameProcess.isActorSpinning(hProcess, baseAddr) || gameProcess.isSpinning(hProcess, baseAddr)) { break; } }
 
         // Game input is now unlocked, start script execution
-
         std::cout << CLIENT_INPUT_UNLOCKED;
         CloseHandle(hProcess);
         actionReader();
+
     }
 
 
     // Same as start yet without ingame client-sync-state checks and instant execution
     void run(int* data, size_t length) {
-        scriptData = data;
-        scriptLength = length;
-        yawspeed = 0.0f;
-        pitchspeed = 0.0f;
-        // reset accumulators
-        accumMouseX = 0.0f;
-        accumMouseY = 0.0f;
+
+        scriptData      = data;
+        scriptLength    = length;
+        yawspeed        = 0.0f;
+        pitchspeed      = 0.0f;
+        accumMouseX     = 0.0f;
+        accumMouseY     = 0.0f;
+
         heldStates.clear();
         userBinds.setup();
         actionReader();
@@ -189,182 +191,192 @@ struct ScriptReplayer_s {
     }
 
     void actionReader() {
-    // Focus game window by process name
-    HWND hwnd = gameProcess.FindGameWindow("XR_3DA.exe");
-    if (hwnd) {
-        ShowWindow(hwnd, SW_RESTORE);  // Restore if minimized
-        SetForegroundWindow(hwnd);
-    } else {
-        std::cerr << GAME_NOT_FOUND;
-        return;  // Exit to avoid sending inputs elsewhere
-    }
 
-    // *** CACHE ALL HANDLES/ADDRESSES ONCE BEFORE THE LOOP ***
-    DWORD pid = gameProcess.GetProcessIdFromWindow(hwnd);
-    HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, pid);
-    if (!hProcess) {
-        std::cerr << FAILED_OPEN_PROCESS;
-        return;
-    }
+        // Focus game window by process name
+        HWND hwnd = gameProcess.FindGameWindow("XR_3DA.exe");
 
-    uintptr_t netBase = gameProcess.GetModuleBaseAddress(pid, "xrNetServer.dll");
-    if (!netBase) {
-        std::cerr << "Failed to get xrNetServer.dll base address.\n";
-        CloseHandle(hProcess);
-        return;
-    }
+        if (hwnd) {
 
-    // Lambda to check game state using cached handles
-    auto isGameLoaded = [&]() -> bool {
-        BYTE loading_0000 = 0, loading_0006 = 0;
-        ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0xFAC4), &loading_0000, 1, NULL);
-        ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0x13E84), &loading_0006, 1, NULL);
-        return (loading_0000 == 1 || loading_0006 == 1);
-    };
+            ShowWindow(hwnd, SW_RESTORE);  // Restore if minimized
+            SetForegroundWindow(hwnd);
 
-    const float frameTime = 0.002f;  // 2ms (500 FPS for safety)
-    const DWORD frameSleep = 2;  // ms per frame
+        } else {
 
-    // Check game state periodically (every N commands) instead of every iteration
-    const size_t HEALTH_CHECK_INTERVAL = 50;  // Adjust based on needs
-    size_t commandsSinceCheck = 0;
+            std::cerr << GAME_NOT_FOUND;
+            return;  // Exit to avoid sending inputs elsewhere
 
-    for (size_t i = 0; i < scriptLength; i += 2) {
-        int opcode = scriptData[i];
-        int value = scriptData[i + 1];
-
-        // Binary state actions (update state and send initial press/release)
-        if (opcode >= -199 && opcode <= -100) {
-            bool down = (value != 0);
-            heldStates[opcode] = down;  // Track state
-
-            switch (opcode) {
-                case CROUCH:     sim.SimulateKey(userBinds.setupBinds[1], down); break;
-                case MOVELEFT:   sim.SimulateKey(userBinds.setupBinds[3], down); break;
-                case MOVERIGHT:  sim.SimulateKey(userBinds.setupBinds[5], down); break;
-                case FORWARD:    sim.SimulateKey(userBinds.setupBinds[7], down); break;
-                case BACK:       sim.SimulateKey(userBinds.setupBinds[9], down); break;
-                case WALK:       sim.SimulateKey(userBinds.setupBinds[11], down); break;
-                case LEANLEFT:   sim.SimulateKey(userBinds.setupBinds[13], down); break;
-                case LEANRIGHT:  sim.SimulateKey(userBinds.setupBinds[15], down); break;
-                case FIRE:       sim.SimulateMouseButton(userBinds.setupBinds[17], down); break;
-                case ZOOM:       sim.SimulateMouseButton(userBinds.setupBinds[19], down); break;
-                // For mouse look (LEFT/RIGHT/UP/DOWN), no hardware input - handled in WAIT loops
-                case LEFT:
-                case RIGHT:
-                case UP:
-                case DOWN:
-                    break;  // State tracked, applied during waits
-                default:         std::cerr << UNKNOWN_BINARY_ACTION << opcode << "\n"; break;
-            }
-        }
-        // Parameterized state actions
-        else if (opcode >= -299 && opcode <= -200) {
-            switch (opcode) {
-                case YAWSPEED:   yawspeed = static_cast<float>(value); break;
-                case PITCHSPEED: pitchspeed = static_cast<float>(value); break;
-                case WAIT: {
-                    // Break wait into frames, applying held mouse looks each frame
-                    for (DWORD elapsed = 0; elapsed < static_cast<DWORD>(value); elapsed += frameSleep) {
-                        // Accumulate fractional mouse movement per frame (preserve precision)
-                        float deltaX = 0.0f, deltaY = 0.0f;
-
-                        if (heldStates[LEFT] && yawspeed != 0.0f) {
-                            deltaX -= (yawspeed * frameTime);
-                        }
-                        if (heldStates[RIGHT] && yawspeed != 0.0f) {
-                            deltaX += (yawspeed * frameTime);
-                        }
-                        if (heldStates[UP] && pitchspeed != 0.0f) {
-                            deltaY -= (pitchspeed * frameTime);
-                        }
-                        if (heldStates[DOWN] && pitchspeed != 0.0f) {
-                            deltaY += (pitchspeed * frameTime);
-                        }
-
-                        // Add to accumulators (retain fractional parts)
-                        accumMouseX += deltaX;
-                        accumMouseY += deltaY;
-
-                        // Only send integer movement; subtract sent amount from accumulators
-                        int sendX = static_cast<int>(accumMouseX); // trunc toward zero
-                        int sendY = static_cast<int>(accumMouseY);
-
-                        if (sendX != 0 || sendY != 0) {
-                            sim.SimulateMouseMove(sendX, sendY);
-                            accumMouseX -= sendX;
-                            accumMouseY -= sendY;
-                        }
-
-                        // Keys/buttons stay held automatically—no resend needed
-                        sim.PreciseSleep(frameSleep);
-                    }
-                    break;
-                }
-                default: std::cerr << UNKNOWN_PARAMETERIZED_ACTION << opcode << "\n"; break;
-            }
-        }
-        // Trigger state actions
-        else if (opcode >= -399 && opcode <= -300) {
-            switch (opcode) {
-                case INVENTORY:  TriggerKey(userBinds.setupBinds[21]); break;
-                case MEDKIT:     TriggerKey(userBinds.setupBinds[23]); break;
-                case BANDAGE:    TriggerKey(userBinds.setupBinds[25]); break;
-                case SPRINT:     TriggerKey(userBinds.setupBinds[27]); break;
-                case DROP:       TriggerKey(userBinds.setupBinds[29]); break;
-                case SAVEGAME:   TriggerKey(userBinds.setupBinds[31]); break;
-                case LOADGAME:   TriggerKey(userBinds.setupBinds[33]); break;
-                case JUMP:       TriggerKey(userBinds.setupBinds[35]); break;
-                case KNIFE:      TriggerKey(userBinds.setupBinds[37]); break;
-                case PISTOL:     TriggerKey(userBinds.setupBinds[39]); break;
-                case RIFLE:      TriggerKey(userBinds.setupBinds[41]); break;
-                case NADE:       TriggerKey(userBinds.setupBinds[43]); break;
-                case BINOC:      TriggerKey(userBinds.setupBinds[45]); break;
-                case BOLT:       TriggerKey(userBinds.setupBinds[47]); break;
-                case RELOAD:     TriggerKey(userBinds.setupBinds[49]); break;
-                case TYPE:       TriggerKey(userBinds.setupBinds[51]); break;
-                case LAUNCHER:   TriggerKey(userBinds.setupBinds[53]); break;
-                case USE:        TriggerKey(userBinds.setupBinds[55]); break;
-                case PAUSE:      TriggerKey(userBinds.setupBinds[57]); break;
-                case ESCAPE:     TriggerKey(userBinds.setupBinds[59]); break;
-                case FIREMODE:   TriggerKey(userBinds.setupBinds[61]); break;
-                case TIMEACCEL:  TriggerKey(VK_MULTIPLY); break;  // Numpad *
-                case TIMEDECCEL: {
-                    INPUT input = {0};
-                    input.type = INPUT_KEYBOARD;
-                    input.ki.wVk = VK_DIVIDE;
-                    input.ki.wScan = 0x35;
-                    input.ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
-                    SendInput(1, &input, sizeof(INPUT));
-                    sim.PreciseSleep(1);
-                    input.ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
-                    SendInput(1, &input, sizeof(INPUT));
-                    sim.PreciseSleep(1);
-                    break;
-                }
-                default:         std::cerr << UNKNOWN_TRIGGER_ACTION << opcode << "\n"; break;
-            }
         }
 
+        // *** CACHE ALL HANDLES/ADDRESSES ONCE BEFORE THE LOOP ***
 
-        if (!isGameLoaded()) {
-            std::cerr << "Game is no longer loaded.\n";
-            CloseHandle(hProcess);  // Clean up handle
+        DWORD pid = gameProcess.GetProcessIdFromWindow(hwnd);
+        HANDLE hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, pid);
+
+        if (!hProcess) {
+
+            std::cerr << FAILED_OPEN_PROCESS;
             return;
-        }
-    }
 
-    // Clean up handle when done
-    CloseHandle(hProcess);
-}
+        }
+
+        uintptr_t netBase = gameProcess.GetModuleBaseAddress(pid, "xrNetServer.dll");
+
+        if (!netBase) {
+
+            std::cerr << "Failed to get xrNetServer.dll base address.\n";
+            CloseHandle(hProcess);
+            return;
+
+        }
+
+        // Lambda to check game state using cached handles
+        auto isGameLoaded = [&]() -> bool {
+
+            BYTE loading_0000 = 0, loading_0006 = 0;
+            ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0xFAC4), &loading_0000, 1, NULL);
+            ReadProcessMemory(hProcess, (LPCVOID)(netBase + 0x13E84), &loading_0006, 1, NULL);
+            return (loading_0000 == 1 || loading_0006 == 1);
+
+        };
+
+        const float frameTime  = 0.002f;  // 2ms (500 FPS for safety)
+        const DWORD frameSleep = 2;  // ms per frame
+
+        for (size_t i = 0; i < scriptLength; i += 2) {
+
+            int opcode = scriptData[i];
+            int value = scriptData[i + 1];
+
+            // Binary state actions (update state and send initial press/release)
+            if (opcode >= -199 && opcode <= -100) {
+
+                bool down = (value != 0);
+                heldStates[opcode] = down;  // Track state
+
+                switch (opcode) {
+
+                    case CROUCH:     sim.SimulateKey(userBinds.setupBinds[1], down); break;
+                    case MOVELEFT:   sim.SimulateKey(userBinds.setupBinds[3], down); break;
+                    case MOVERIGHT:  sim.SimulateKey(userBinds.setupBinds[5], down); break;
+                    case FORWARD:    sim.SimulateKey(userBinds.setupBinds[7], down); break;
+                    case BACK:       sim.SimulateKey(userBinds.setupBinds[9], down); break;
+                    case WALK:       sim.SimulateKey(userBinds.setupBinds[11], down); break;
+                    case LEANLEFT:   sim.SimulateKey(userBinds.setupBinds[13], down); break;
+                    case LEANRIGHT:  sim.SimulateKey(userBinds.setupBinds[15], down); break;
+                    case FIRE:       sim.SimulateMouseButton(userBinds.setupBinds[17], down); break;
+                    case ZOOM:       sim.SimulateMouseButton(userBinds.setupBinds[19], down); break;
+                    default:         std::cerr << UNKNOWN_BINARY_ACTION << opcode << "\n"; break;
+
+                }
+                // Parameterized state actions
+            } else if (opcode >= -299 && opcode <= -200) {
+
+                switch (opcode) {
+
+                    case YAWSPEED:   yawspeed = static_cast<float>(value); break;
+                    case PITCHSPEED: pitchspeed = static_cast<float>(value); break;
+                    case WAIT: {
+
+                        // Break wait into frames, applying held mouse looks each frame
+                        for (DWORD elapsed = 0; elapsed < static_cast<DWORD>(value); elapsed += frameSleep) {
+                            // Accumulate fractional mouse movement per frame (preserve precision)
+                            float deltaX = 0.0f, deltaY = 0.0f;
+
+                            if (heldStates[LEFT] && yawspeed != 0.0f)   { deltaX -= (yawspeed * frameTime); }
+                            if (heldStates[RIGHT] && yawspeed != 0.0f)  { deltaX += (yawspeed * frameTime); }
+                            if (heldStates[UP] && pitchspeed != 0.0f)   { deltaY -= (pitchspeed * frameTime); }
+                            if (heldStates[DOWN] && pitchspeed != 0.0f) { deltaY += (pitchspeed * frameTime); }
+
+                            // Add to accumulators (retain fractional parts)
+                            accumMouseX += deltaX;
+                            accumMouseY += deltaY;
+
+                            // Only send integer movement; subtract sent amount from accumulators
+                            int sendX = static_cast<int>(accumMouseX); // trunc toward zero
+                            int sendY = static_cast<int>(accumMouseY);
+
+                            if (sendX != 0 || sendY != 0) {
+
+                                sim.SimulateMouseMove(sendX, sendY);
+                                accumMouseX -= sendX;
+                                accumMouseY -= sendY;
+
+                            }
+                            // Keys/buttons stay held automatically—no resend needed
+                            sim.PreciseSleep(frameSleep);
+                        }
+                        break;
+                    }
+                    default: std::cerr << UNKNOWN_PARAMETERIZED_ACTION << opcode << "\n"; break;
+                }
+                // Trigger state actions
+            } else if (opcode >= -399 && opcode <= -300) {
+
+                switch (opcode) {
+
+                    case INVENTORY:  TriggerKey(userBinds.setupBinds[21]); break;
+                    case MEDKIT:     TriggerKey(userBinds.setupBinds[23]); break;
+                    case BANDAGE:    TriggerKey(userBinds.setupBinds[25]); break;
+                    case SPRINT:     TriggerKey(userBinds.setupBinds[27]); break;
+                    case DROP:       TriggerKey(userBinds.setupBinds[29]); break;
+                    case SAVEGAME:   TriggerKey(userBinds.setupBinds[31]); break;
+                    case LOADGAME:   TriggerKey(userBinds.setupBinds[33]); break;
+                    case JUMP:       TriggerKey(userBinds.setupBinds[35]); break;
+                    case KNIFE:      TriggerKey(userBinds.setupBinds[37]); break;
+                    case PISTOL:     TriggerKey(userBinds.setupBinds[39]); break;
+                    case RIFLE:      TriggerKey(userBinds.setupBinds[41]); break;
+                    case NADE:       TriggerKey(userBinds.setupBinds[43]); break;
+                    case BINOC:      TriggerKey(userBinds.setupBinds[45]); break;
+                    case BOLT:       TriggerKey(userBinds.setupBinds[47]); break;
+                    case RELOAD:     TriggerKey(userBinds.setupBinds[49]); break;
+                    case TYPE:       TriggerKey(userBinds.setupBinds[51]); break;
+                    case LAUNCHER:   TriggerKey(userBinds.setupBinds[53]); break;
+                    case USE:        TriggerKey(userBinds.setupBinds[55]); break;
+                    case PAUSE:      TriggerKey(userBinds.setupBinds[57]); break;
+                    case ESCAPE:     TriggerKey(userBinds.setupBinds[59]); break;
+                    case FIREMODE:   TriggerKey(userBinds.setupBinds[61]); break;
+                    case TIMEACCEL:  TriggerKey(VK_MULTIPLY); break;  // Numpad *
+
+                    case TIMEDECCEL: {
+
+                        INPUT input = {0};
+                        input.type = INPUT_KEYBOARD;
+                        input.ki.wVk = VK_DIVIDE;
+                        input.ki.wScan = 0x35;
+                        input.ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
+                        SendInput(1, &input, sizeof(INPUT));
+                        sim.PreciseSleep(1);
+                        input.ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
+                        SendInput(1, &input, sizeof(INPUT));
+                        sim.PreciseSleep(1);
+                        break;
+
+                    }
+                    default:         std::cerr << UNKNOWN_TRIGGER_ACTION << opcode << "\n"; break;
+                }
+
+            }
+
+            if (!isGameLoaded()) {
+
+                std::cerr << "Game is no longer loaded.\n";
+                CloseHandle(hProcess);  // Clean up handle
+                return;
+
+            }
+
+        }
+        CloseHandle(hProcess);
+    }
 
     void TriggerKey(WORD vkCode) {
+
         sim.SimulateKey(vkCode, true);
         sim.PreciseSleep(1);
         sim.SimulateKey(vkCode, false);
         sim.PreciseSleep(1);
-    }
 
+    }
 
 };
 

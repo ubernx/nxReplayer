@@ -27,134 +27,152 @@ struct UserBinds_s {
     bool validBinds;
 
     void setup() {
+
         validBinds = true;
         binds.clear();
         importBinds();
 
-        if (validBinds) {
-            verifyBinds();
-        }
+        if (validBinds) verifyBinds();
 
-        if (validBinds) {
-            loadBinds();
-        } else {
+
+        if (validBinds) { loadBinds(); } else {
+
             std::cerr << INVALID_BINDS;
             loadDefaultBinds();
+
         }
+
     }
 
     // Converting the vector to an odd even separated array
     void loadBinds() {
 
         int idx = 0;
+
         for (const auto& fullLine : binds) {
-            auto pos = fullLine.find('=');
-            std::string actionName = trim(fullLine.substr(0, pos));
-            std::string keyName = trim(fullLine.substr(pos + 1));
+
+            auto pos          = fullLine.find('=');
+            std::string actionName  = trim(fullLine.substr(0, pos));
+            std::string keyName     = trim(fullLine.substr(pos + 1));
 
             setupBinds[idx++] = ACTION_MAP.at(actionName);
             setupBinds[idx++] = KEY_MAP.at(keyName);
+
         }
 
     }
 
     void importBinds() {
+
         std::ifstream file(BINDS);
 
         if (!file.is_open()) {
+
             std::cerr << CANTOPEN;
             validBinds = false;
             return;
-        }
 
+        }
 
         std::string line;
         int lineIdx = 0;
+
         while (std::getline(file, line)) {
             // Trim leading whitespace
-            line.erase(line.begin(), std::find_if(line.begin(), line.end(), [](unsigned char ch) {
-                return !std::isspace(ch);
-            }));
+            line.erase(line.begin(), std::find_if(line.begin(), line.end(), [](unsigned char ch)  { return !std::isspace(ch); }));
 
             // Skip empty lines and comments
-            if (line.empty() || (line.size() >= 2 && line[0] == '/' && line[1] == '/')) {
-                continue;
-            }
+            if (line.empty() || (line.size() >= 2 && line[0] == '/' && line[1] == '/')) continue;
 
             // Ensure the line uses correct format
             auto pos = line.find('=');
+
             if (pos == std::string::npos) {
+
                 std::cerr << INVALID_FORMAT << line << "\n";
                 validBinds = false;
                 file.close();
                 return;
+
             }
 
-            std::string action = trim(line.substr(0, pos));
-            std::string key = trim(line.substr(pos + 1));
+            std::string action  = trim(line.substr(0, pos));
+            std::string key     = trim(line.substr(pos + 1));
 
             // Enforce ordering
             if (lineIdx < requiredActions.size() && action != requiredActions[lineIdx]) {
-                std::cerr << INVALID_ORDER << requiredActions[lineIdx]
-                          << "', got '" << action << "'\n";
+
+                std::cerr << INVALID_ORDER << requiredActions[lineIdx] << "', got '" << action << "'\n";
                 validBinds = false;
                 file.close();
                 return;
+
             }
 
             // Validate action exists
             if (ACTION_MAP.find(action) == ACTION_MAP.end()) {
+
                 std::cerr << INVALID_ACTION << action << "\n";
                 validBinds = false;
                 file.close();
                 return;
+
             }
 
             // Validate key exists
             if (KEY_MAP.find(key) == KEY_MAP.end()) {
+
                 std::cerr << INVALID_KEY << key << "\n";
                 validBinds = false;
                 file.close();
                 return;
+
             }
 
             binds.push_back(line);
             ++lineIdx;
+
         }
 
         // Must be exactly 31 at the end
-        if (binds.size() != BINDS_COUNT) {
-            validBinds = false;
-        }
-
+        if (binds.size() != BINDS_COUNT) validBinds = false;
         file.close();
+
     }
 
     void verifyBinds() {
+
         std::unordered_set<std::string> foundKeys;
 
         for (const auto& line : binds) {
+
             auto pos = line.find('=');
+
             if (pos == std::string::npos) {
+
                 validBinds = false;
                 return;
+
             }
 
             std::string key = trim(line.substr(pos + 1));
 
             // Check for duplicate keys (exclude mouse since 1-5 do exist)
             if (key.find(ALLOWED_DUPLICATE) == std::string::npos && foundKeys.count(key)) {
+
                 std::cerr << DUPLICATE_KEY << key << "\n";
                 validBinds = false;
                 return;
-            }
 
+            }
             foundKeys.insert(key);
         }
+
     }
 
     // Load default binds if user configuration is invalid
     void loadDefaultBinds() {
+
         setupBinds[0]  = ACTION_MAP.at("crouch");     setupBinds[1]  = DIK_LCONTROL;
         setupBinds[2]  = ACTION_MAP.at("moveleft");   setupBinds[3]  = DIK_A;
         setupBinds[4]  = ACTION_MAP.at("moveright");  setupBinds[5]  = DIK_D;
@@ -186,17 +204,21 @@ struct UserBinds_s {
         setupBinds[56] = ACTION_MAP.at("pause");      setupBinds[57] = DIK_PAUSE;
         setupBinds[58] = ACTION_MAP.at("escape");     setupBinds[59] = DIK_ESCAPE;
         setupBinds[60] = ACTION_MAP.at("firemode");   setupBinds[61] = DIK_0;
+
     }
 
     std::vector<std::string> requiredActions = {
+
         "crouch", "moveleft", "moveright", "forward", "back", "walk",
         "leanleft", "leanright", "fire", "zoom", "inventory", "medkit",
         "bandage", "sprint", "drop", "savegame", "loadgame", "jump",
         "knife", "pistol", "rifle", "nade", "binoc", "bolt", "reload",
         "type", "launcher", "use", "pause", "escape", "firemode"
+
     };
 
     inline static const std::unordered_map<std::string, DWORD> KEY_MAP = {
+
         // Letters
         {"A", 'A'}, {"B", 'B'}, {"C", 'C'}, {"D", 'D'}, {"E", 'E'},
         {"F", 'F'}, {"G", 'G'}, {"H", 'H'}, {"I", 'I'}, {"J", 'J'},
@@ -247,9 +269,11 @@ struct UserBinds_s {
         // Mouse placeholders
         {"MOUSE1", 1}, {"MOUSE2", 2}, {"MOUSE3", 3},
         {"MOUSE4", 4}, {"MOUSE5", 5},
+
     };
 
     inline static const std::unordered_map<std::string, int> ACTION_MAP = {
+
         {"crouch",      -101}, {"moveleft",    -102}, {"moveright",   -103},
         {"forward",     -104}, {"back",        -105}, {"walk",        -106},
         {"left",        -107}, {"right",       -108}, {"up",          -109},
@@ -263,16 +287,23 @@ struct UserBinds_s {
         {"bolt",        -314}, {"reload",      -315}, {"type",        -316},
         {"launcher",    -317}, {"use",         -318}, {"pause",       -319},
         {"escape",      -320}, {"firemode",    -321}
+
     };
 
     std::string trim(const std::string& s) {
-        std::string result = s;
-        result.erase(result.begin(), std::find_if(result.begin(), result.end(),
-            [](unsigned char ch) { return !std::isspace(ch); }));
 
-        result.erase(std::find_if(result.rbegin(), result.rend(),
-            [](unsigned char ch) { return !std::isspace(ch); }).base(), result.end());
+        std::string result = s;
+
+        result.erase(
+            result.begin(),std::find_if(
+                result.begin(), result.end(),[](unsigned char ch) { return !std::isspace(ch); }));
+
+        result.erase(
+            std::find_if(
+                result.rbegin(), result.rend(),[](unsigned char ch) { return !std::isspace(ch); }).base(), result.end());
 
         return result;
+
     }
+
 };

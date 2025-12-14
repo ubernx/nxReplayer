@@ -113,47 +113,39 @@ struct ScriptFile_s {
 
     }
 
-    void loadScript(const fs::path& filePath, std::unordered_set<std::string>& loaded) {
+        void loadScript(const fs::path& filePath, std::unordered_set<std::string>& loaded) {
 
-        // Looking whether according files are present in the directory
-
+        // detect circular includes (recursion stack)
         if (loaded.contains(filePath.string())) {
-
-            std::cerr << FILE_NOT_FOUND << filePath << "\n";
+            std::cerr << RECURVSICE_ANCHOR << filePath << "\n";
             return;
-
         }
 
-        loaded.insert(filePath.string());
         std::ifstream file(filePath);
 
         // Checking if the txt file is openable
-
         if (!file.is_open()) {
-
             std::cerr << CANT_OPEN << filePath << "\n";
             return;
-
         }
 
+        // mark as currently being processed (recursion stack)
+        loaded.insert(filePath.string());
         std::string line;
 
         while (std::getline(file, line)) {
-
             std::stringstream ss(line);
             std::string token;
 
-            // split the tokens at the semicolon, store each resulted toke in a vector
             while (std::getline(ss, token, SEMICOLON)) {
 
                 if (token.empty()) continue;
 
                 // Trim whitespace
-
                 while (!token.empty() && std::isspace(static_cast<unsigned char>(token.front()))) token.erase(token.begin());
                 while (!token.empty() && std::isspace(static_cast<unsigned char>(token.back())))  token.pop_back();
 
-                // Handle recursive script call
+                // Check for run function to load sub-scripts
                 if (token.rfind(RUN_FUNCTION, 0) == 0) {
 
                     std::string subName = token.substr(RUN_FUNCTION.size());
@@ -166,44 +158,37 @@ struct ScriptFile_s {
                     tokens.insert(tokens.end(), sub.tokens.begin(), sub.tokens.end());
 
                 } else {
-                     // Check for + or - commands
+                    // existing token handling (checks + pushing)
+                    if (!token.empty() && (token[0] == '+' || token[0] == '-')) {
 
-                     if (!token.empty() && (token[0] == '+' || token[0] == '-')) {
+                        std::string actionName = token.substr(1);
 
-                         std::string actionName = token.substr(1);
+                        if (ACTION_MAP.find(actionName) == ACTION_MAP.end()) {
+                            std::cerr << TYPO_WARNING << token << IN_FILE << filePath << "\n";
+                            hasTypo = true;
+                        }
 
-                         if (ACTION_MAP.find(actionName) == ACTION_MAP.end()) {
+                    } else {
 
-                             std::cerr << TYPO_WARNING << token
-                                       << IN_FILE << filePath << "\n";
-                             hasTypo = true;
+                        std::stringstream ssToken(token);
+                        std::string key, valueStr;
+                        ssToken >> key >> valueStr;
 
-                         }
+                        if (!key.empty() && ACTION_MAP.find(key) == ACTION_MAP.end()) {
+                            std::cerr << TYPO_WARNING << key << IN_FILE << filePath << "\n";
+                            hasTypo = true;
+                        }
 
-                     } else {
+                    }
 
-                         // Searching up the token in the action map, if nothing found -> user typoed an action
-                         std::stringstream ssToken(token);
-                         std::string key, valueStr;
-                         ssToken >> key >> valueStr;
-
-                         if (!key.empty() && ACTION_MAP.find(key) == ACTION_MAP.end()) {
-
-                             std::cerr << TYPO_WARNING << key
-                                       << IN_FILE << filePath << "\n";
-                             hasTypo = true;
-
-                         }
-
-                     }
-
-                     tokens.push_back(token);
+                    tokens.push_back(token);
                 }
 
             }
-
         }
 
+        // finished processing this file — remove from recursion stack so it can be included again later
+        loaded.erase(filePath.string());
     }
 
     void convert() {
@@ -310,8 +295,8 @@ struct ScriptFile_s {
         tokenCount = 0;
         return;
 
-    } else { isSetUp = true; }
-
+    }
+        isSetUp = true;
 }
 
 

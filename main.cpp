@@ -5,10 +5,9 @@
 #include <unordered_map>
 #include <windows.h>
 #include <algorithm>
-#include <cctype>
-#include "ScriptFile.hpp"
-#include "ScriptReplayer.hpp"
 
+import ScriptFile;
+import ScriptReplayer;
 // Loading ANSI Colors
 
 void enableANSI() {

@@ -1,14 +1,12 @@
-﻿#ifndef GAMEPROCESSUTILS_HPP
-#define GAMEPROCESSUTILS_HPP
+﻿module;
 
 #include <windows.h>
 #include <tlhelp32.h>
 #include <iostream>
-#include <cstring> // _stricmp
-#include <cmath>   // std::fabs
-#include <cstdint> // uint8_t
 
-struct GameProcessUtils_s {
+export module GameProcessUtils;
+
+export struct GameProcessUtils_s {
 
     struct WindowData { DWORD pid; HWND hwnd; };
 
@@ -93,18 +91,21 @@ struct GameProcessUtils_s {
         return baseAddr;
     }
 
-    // 1.0000 - now takes baseAddr parameter
-    bool IsLoadingScreenActive(HANDLE processHandle, uintptr_t baseAddr) {
+
+    /*  OLD VERSION
+    // 1.0000
+    bool isLoading1_0000(HANDLE processHandle, uintptr_t baseAddr) {
 
         uintptr_t loadingScreenAddr = baseAddr + 0xD0644;  // Offset from base
-        byte loadingScreen = 0;
-        ReadProcessMemory(processHandle, reinterpret_cast<LPCVOID>(loadingScreenAddr), &loadingScreen, 1, NULL);
-        return (loadingScreen == 1);
+        byte isLoading = 0;
+        ReadProcessMemory(processHandle, reinterpret_cast<LPCVOID>(loadingScreenAddr), &isLoading, 1, NULL);
+        return (isLoading == 1);
 
     }
+    */
 
-    // 1.0000 - now takes baseAddr parameter
-    bool isActorSpinning(HANDLE processHandle, uintptr_t baseAddr) {
+    // 1.0000
+    bool isSpinning1_0000(HANDLE processHandle, uintptr_t baseAddr) {
 
         const uintptr_t yawAddr = baseAddr + 0x10498C;  // Offset from base
         float v1, v2;
@@ -118,8 +119,10 @@ struct GameProcessUtils_s {
 
     }
 
-    // 1.0006 - now takes baseAddr parameter
-    bool IsGameLoading(HANDLE processHandle, uintptr_t baseAddr) {
+
+    /* OLD VERSION
+    // 1.0006
+    bool isLoading1_0006(HANDLE processHandle, uintptr_t baseAddr) {
 
         uintptr_t isLoadingAddr = baseAddr + 0xD7B9C;  // Offset from base
         byte isLoading = 0;
@@ -127,9 +130,10 @@ struct GameProcessUtils_s {
         return (isLoading == 1);
 
     }
+    */
 
-    // 1.0006 - now takes baseAddr parameter
-    bool isSpinning(HANDLE processHandle, uintptr_t baseAddr) {
+    // 1.0006
+    bool isSpinning1_0006(HANDLE processHandle, uintptr_t baseAddr) {
 
         const uintptr_t yawAddr = baseAddr + 0x10BEE4;  // Offset from base
         float v1, v2;
@@ -162,5 +166,3 @@ struct GameProcessUtils_s {
         }
 
 };
-
-#endif // GAMEPROCESSUTILS_HPP

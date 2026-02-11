@@ -1,17 +1,17 @@
-#ifndef SCRIPTREPLAYER_HPP
-#define SCRIPTREPLAYER_HPP
+module;
 
 #include <windows.h>
-#include "InputSimulator.hpp"
-#include "GameProcessUtils.hpp"
-#include "UserBinds.hpp"
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include <cmath>
-#include <thread>
 
-struct ScriptReplayer_s {
+export module ScriptReplayer;
+
+import InputSimulator;
+import GameProcessUtils;
+import UserBinds;
+
+export struct ScriptReplayer_s {
 
     const std::string UNKNOWN_BINARY_ACTION        = "Unknown toggle (+/-)action: ";
     const std::string UNKNOWN_PARAMETERIZED_ACTION = "Unknown parameter: ";
@@ -164,7 +164,7 @@ struct ScriptReplayer_s {
 
         // Game is now in client sync, userinput is unlocked, initiate script
         std::cout << CLIENT_SYNC_DETECTED;
-        while (true) { if (gameProcess.isActorSpinning(hProcess, baseAddr) || gameProcess.isSpinning(hProcess, baseAddr)) { break; } }
+        while (true) { if (gameProcess.isSpinning1_0000(hProcess, baseAddr) || gameProcess.isSpinning1_0006(hProcess, baseAddr)) { break; } }
 
         // Game input is now unlocked, start script execution
         std::cout << CLIENT_INPUT_UNLOCKED;
@@ -380,4 +380,3 @@ struct ScriptReplayer_s {
 
 };
 
-#endif // SCRIPTREPLAYER_HPP

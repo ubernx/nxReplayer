@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿module;
+
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -7,8 +9,12 @@
 #include <algorithm>
 #include <unordered_set>
 
+export module UserBinds;
 
-struct UserBinds_s {
+import OpCodeToString;
+
+
+export struct UserBinds_s {
 
     const std::string BINDS             = "binds.txt";
     const std::string CANTOPEN          = "File not found or file has no reading permission.\n";
@@ -272,23 +278,6 @@ struct UserBinds_s {
 
     };
 
-    inline static const std::unordered_map<std::string, int> ACTION_MAP = {
-
-        {"crouch",      -101}, {"moveleft",    -102}, {"moveright",   -103},
-        {"forward",     -104}, {"back",        -105}, {"walk",        -106},
-        {"left",        -107}, {"right",       -108}, {"up",          -109},
-        {"down",        -110}, {"leanleft",    -111}, {"leanright",   -112},
-        {"fire",        -113}, {"zoom",        -114}, {"wait",        -201},
-        {"yawspeed",    -202}, {"pitchspeed",  -203}, {"inventory",   -301},
-        {"medkit",      -302}, {"bandage",     -303}, {"sprint",      -304},
-        {"drop",        -305}, {"savegame",    -306}, {"loadgame",    -307},
-        {"jump",        -308}, {"knife",       -309}, {"pistol",      -310},
-        {"rifle",       -311}, {"nade",        -312}, {"binoc",       -313},
-        {"bolt",        -314}, {"reload",      -315}, {"type",        -316},
-        {"launcher",    -317}, {"use",         -318}, {"pause",       -319},
-        {"escape",      -320}, {"firemode",    -321}
-
-    };
 
     std::string trim(const std::string& s) {
 

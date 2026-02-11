@@ -1,10 +1,11 @@
-#ifndef INPUTSIMULATOR_HPP
-#define INPUTSIMULATOR_HPP
+module;
 
 #include <windows.h>
 #include <winuser.h>
 
-struct InputSimulator {
+export module InputSimulator;
+
+export struct InputSimulator {
 
 private:
     HWND targetWindow = nullptr;
@@ -69,7 +70,7 @@ public:
 
     void SimulateMouseMove(int dx, int dy) {
 
-        // Use SendInput for relative movement and prevent Windows from coalescing moves.
+
         if (dx == 0 && dy == 0) return;
 
         INPUT input{};
@@ -97,5 +98,3 @@ public:
     }
 
 };
-
-#endif // INPUTSIMULATOR_HPP

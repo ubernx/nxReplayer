@@ -1,0 +1,93 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "GNU",
+	"compiler-id" : "Clang",
+	"compiler-simulate-id" : "MSVC",
+	"config" : "Debug",
+	"cxx-modules" : 
+	{
+		"CMakeFiles/nxReplayer.dir/GameProcessUtils.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/GameProcessUtils.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		},
+		"CMakeFiles/nxReplayer.dir/InputSimulator.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/InputSimulator.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		},
+		"CMakeFiles/nxReplayer.dir/OpCodeToString.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/OpCodeToString.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		},
+		"CMakeFiles/nxReplayer.dir/ScriptFile.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/ScriptFile.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		},
+		"CMakeFiles/nxReplayer.dir/ScriptReplayer.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/ScriptReplayer.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		},
+		"CMakeFiles/nxReplayer.dir/UserBinds.cpp.obj" : 
+		{
+			"bmi-only" : false,
+			"destination" : null,
+			"name" : "CXX_MODULES",
+			"relative-directory" : "",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/UserBinds.cpp",
+			"type" : "CXX_MODULES",
+			"visibility" : "PRIVATE"
+		}
+	},
+	"database-info" : null,
+	"dir-cur-bld" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-debug",
+	"dir-cur-src" : "C:/Users/dmitr/CLionProjects/nxReplayer",
+	"dir-top-bld" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-debug",
+	"dir-top-src" : "C:/Users/dmitr/CLionProjects/nxReplayer",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : 
+	[
+		"C:\\Users\\dmitr\\CLionProjects\\nxReplayer",
+		"C:\\Program Files\\JetBrains\\CLion 2025.1.3\\bin\\mingw\\include"
+	],
+	"language" : "CXX",
+	"linked-target-dirs" : [],
+	"module-dir" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-debug/CMakeFiles/nxReplayer.dir",
+	"sources" : 
+	{
+		"CMakeFiles/nxReplayer.dir/main.cpp.obj" : 
+		{
+			"language" : "CXX",
+			"source" : "C:/Users/dmitr/CLionProjects/nxReplayer/main.cpp"
+		}
+	}
+}

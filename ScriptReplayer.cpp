@@ -261,6 +261,10 @@ export struct ScriptReplayer_s {
                     case FORWARD:    sim.SimulateKey(userBinds.setupBinds[7], down); break;
                     case BACK:       sim.SimulateKey(userBinds.setupBinds[9], down); break;
                     case WALK:       sim.SimulateKey(userBinds.setupBinds[11], down); break;
+                    case LEFT:                                                        break;
+                    case RIGHT:                                                       break;
+                    case UP:                                                          break;
+                    case DOWN:                                                        break;
                     case LEANLEFT:   sim.SimulateKey(userBinds.setupBinds[13], down); break;
                     case LEANRIGHT:  sim.SimulateKey(userBinds.setupBinds[15], down); break;
                     case FIRE:       sim.SimulateMouseButton(userBinds.setupBinds[17], down); break;

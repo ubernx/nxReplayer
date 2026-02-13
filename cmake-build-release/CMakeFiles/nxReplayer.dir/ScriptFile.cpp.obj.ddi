@@ -1,0 +1,21 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\ScriptFile.cpp.obj",
+      "provides": [
+        {
+          "is-interface": true,
+          "logical-name": "ScriptFile",
+          "source-path": "C:/Users/dmitr/CLionProjects/nxReplayer/ScriptFile.cpp"
+        }
+      ],
+      "requires": [
+        {
+          "logical-name": "OpCodeToString"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

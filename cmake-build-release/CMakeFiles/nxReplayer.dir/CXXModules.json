@@ -1,0 +1,86 @@
+{
+	"modules" : 
+	{
+		"GameProcessUtils" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/GameProcessUtils.pcm",
+			"is-private" : true
+		},
+		"InputSimulator" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/InputSimulator.pcm",
+			"is-private" : true
+		},
+		"OpCodeToString" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/OpCodeToString.pcm",
+			"is-private" : true
+		},
+		"ScriptFile" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/ScriptFile.pcm",
+			"is-private" : true
+		},
+		"ScriptReplayer" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/ScriptReplayer.pcm",
+			"is-private" : true
+		},
+		"UserBinds" : 
+		{
+			"bmi" : "C:/Users/dmitr/CLionProjects/nxReplayer/cmake-build-release/CMakeFiles/nxReplayer.dir/UserBinds.pcm",
+			"is-private" : true
+		}
+	},
+	"references" : 
+	{
+		"GameProcessUtils" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/GameProcessUtils.pcm"
+		},
+		"InputSimulator" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/InputSimulator.pcm"
+		},
+		"OpCodeToString" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/OpCodeToString.pcm"
+		},
+		"ScriptFile" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/ScriptFile.pcm"
+		},
+		"ScriptReplayer" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/ScriptReplayer.pcm"
+		},
+		"UserBinds" : 
+		{
+			"lookup-method" : "by-name",
+			"path" : "CMakeFiles/nxReplayer.dir/UserBinds.pcm"
+		}
+	},
+	"usages" : 
+	{
+		"ScriptFile" : 
+		[
+			"OpCodeToString"
+		],
+		"ScriptReplayer" : 
+		[
+			"GameProcessUtils",
+			"InputSimulator",
+			"OpCodeToString",
+			"UserBinds"
+		],
+		"UserBinds" : 
+		[
+			"OpCodeToString"
+		]
+	}
+}

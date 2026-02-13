@@ -1,0 +1,16 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\GameProcessUtils.cpp.obj",
+      "provides": [
+        {
+          "is-interface": true,
+          "logical-name": "GameProcessUtils",
+          "source-path": "C:/Users/dmitr/CLionProjects/nxReplayer/GameProcessUtils.cpp"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

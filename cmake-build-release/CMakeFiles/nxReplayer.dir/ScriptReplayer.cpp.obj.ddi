@@ -1,0 +1,27 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\ScriptReplayer.cpp.obj",
+      "provides": [
+        {
+          "is-interface": true,
+          "logical-name": "ScriptReplayer",
+          "source-path": "C:/Users/dmitr/CLionProjects/nxReplayer/ScriptReplayer.cpp"
+        }
+      ],
+      "requires": [
+        {
+          "logical-name": "InputSimulator"
+        },
+        {
+          "logical-name": "GameProcessUtils"
+        },
+        {
+          "logical-name": "UserBinds"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

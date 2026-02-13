@@ -1,0 +1,17 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\main.cpp.obj",
+      "requires": [
+        {
+          "logical-name": "ScriptFile"
+        },
+        {
+          "logical-name": "ScriptReplayer"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

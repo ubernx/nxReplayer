@@ -1,0 +1,6 @@
+-fmodule-file=ScriptFile=CMakeFiles/nxReplayer.dir/ScriptFile.pcm
+-fmodule-file=ScriptReplayer=CMakeFiles/nxReplayer.dir/ScriptReplayer.pcm
+-fmodule-file=GameProcessUtils=CMakeFiles/nxReplayer.dir/GameProcessUtils.pcm
+-fmodule-file=InputSimulator=CMakeFiles/nxReplayer.dir/InputSimulator.pcm
+-fmodule-file=OpCodeToString=CMakeFiles/nxReplayer.dir/OpCodeToString.pcm
+-fmodule-file=UserBinds=CMakeFiles/nxReplayer.dir/UserBinds.pcm

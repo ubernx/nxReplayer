@@ -1,0 +1,16 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\OpCodeToString.cpp.obj",
+      "provides": [
+        {
+          "is-interface": true,
+          "logical-name": "OpCodeToString",
+          "source-path": "C:/Users/dmitr/CLionProjects/nxReplayer/OpCodeToString.cpp"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

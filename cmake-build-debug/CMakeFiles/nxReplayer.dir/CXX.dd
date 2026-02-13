@@ -1,0 +1,21 @@
+ninja_dyndep_version = 1.0
+build CMakeFiles/nxReplayer.dir/main.cpp.obj: dyndep | CMakeFiles/nxReplayer.dir/ScriptFile.pcm CMakeFiles/nxReplayer.dir/ScriptReplayer.pcm
+
+build CMakeFiles/nxReplayer.dir/ScriptFile.cpp.obj | CMakeFiles/nxReplayer.dir/ScriptFile.pcm: dyndep | CMakeFiles/nxReplayer.dir/OpCodeToString.pcm
+  restat = 1
+
+build CMakeFiles/nxReplayer.dir/ScriptReplayer.cpp.obj | CMakeFiles/nxReplayer.dir/ScriptReplayer.pcm: dyndep | CMakeFiles/nxReplayer.dir/InputSimulator.pcm CMakeFiles/nxReplayer.dir/GameProcessUtils.pcm CMakeFiles/nxReplayer.dir/UserBinds.pcm
+  restat = 1
+
+build CMakeFiles/nxReplayer.dir/InputSimulator.cpp.obj | CMakeFiles/nxReplayer.dir/InputSimulator.pcm: dyndep
+  restat = 1
+
+build CMakeFiles/nxReplayer.dir/GameProcessUtils.cpp.obj | CMakeFiles/nxReplayer.dir/GameProcessUtils.pcm: dyndep
+  restat = 1
+
+build CMakeFiles/nxReplayer.dir/UserBinds.cpp.obj | CMakeFiles/nxReplayer.dir/UserBinds.pcm: dyndep | CMakeFiles/nxReplayer.dir/OpCodeToString.pcm
+  restat = 1
+
+build CMakeFiles/nxReplayer.dir/OpCodeToString.cpp.obj | CMakeFiles/nxReplayer.dir/OpCodeToString.pcm: dyndep
+  restat = 1
+

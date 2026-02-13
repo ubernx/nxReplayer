@@ -1,0 +1,16 @@
+{
+  "revision": 0,
+  "rules": [
+    {
+      "primary-output": "CMakeFiles\\nxReplayer.dir\\InputSimulator.cpp.obj",
+      "provides": [
+        {
+          "is-interface": true,
+          "logical-name": "InputSimulator",
+          "source-path": "C:/Users/dmitr/CLionProjects/nxReplayer/InputSimulator.cpp"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
